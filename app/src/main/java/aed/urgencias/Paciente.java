@@ -88,14 +88,28 @@ public class Paciente implements Comparable<Paciente> {
   // (ve la descripcion en la guia)
   @Override
   public int compareTo(Paciente paciente) {
-    return -1;
+    int p1Mayor = 1;
+    if (paciente.prioridad < this.prioridad) {
+      p1Mayor = -1;
+    } else if (paciente.prioridad == this.prioridad) {
+      if (paciente.tiempoAdmisionEnPrioridad > this.tiempoAdmisionEnPrioridad) {
+        p1Mayor = -1;
+      } else if (paciente.tiempoAdmisionEnPrioridad == this.tiempoAdmisionEnPrioridad) {
+        if (paciente.tiempoAdmision > this.tiempoAdmision) {
+          p1Mayor = -1;
+        }
+      }
+    }
+    return p1Mayor;
   }
   
   // Hay que definir equals
   // Usad solo el DNI al comparar pacientes
   @Override
   public boolean equals(Object obj) {
-    return false;
+    if (this.getClass() != obj.getClass()) return false; //no se si esta linea es necesaria
+    Paciente objPaciente = (Paciente) obj;
+    return this.DNI.equals(objPaciente.DNI);
   }
 
   // Hay que definit hashCode
