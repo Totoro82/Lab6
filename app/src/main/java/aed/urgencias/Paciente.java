@@ -7,11 +7,11 @@ public class Paciente implements Comparable<Paciente> {
 
   // DNI
   private String DNI;
-  // Prioridad 
+  // Prioridad
   private int prioridad;
   // Tiempo de admision en las urgencias
   private int tiempoAdmision;
-  // Tiempo cuando entro en la prioridad 
+  // Tiempo cuando entro en la prioridad
   private int tiempoAdmisionEnPrioridad;
 
   /**
@@ -88,26 +88,26 @@ public class Paciente implements Comparable<Paciente> {
   // (ve la descripcion en la guia)
   @Override
   public int compareTo(Paciente paciente) {
-    int p1Mayor = 1;
-    if (paciente.prioridad < this.prioridad) {
-      p1Mayor = -1;
+    int prioridad = 1;
+    if (this.prioridad < paciente.prioridad) {
+      prioridad = -1;
     } else if (paciente.prioridad == this.prioridad) {
-      if (paciente.tiempoAdmisionEnPrioridad > this.tiempoAdmisionEnPrioridad) {
-        p1Mayor = -1;
+      if (this.tiempoAdmisionEnPrioridad < paciente.tiempoAdmisionEnPrioridad) {
+        prioridad = -1;
       } else if (paciente.tiempoAdmisionEnPrioridad == this.tiempoAdmisionEnPrioridad) {
-        if (paciente.tiempoAdmision > this.tiempoAdmision) {
-          p1Mayor = -1;
+        if (this.tiempoAdmision < paciente.tiempoAdmision) {
+          prioridad = -1;
         }
       }
     }
-    return p1Mayor;
+    return prioridad;
   }
-  
+
   // Hay que definir equals
   // Usad solo el DNI al comparar pacientes
   @Override
   public boolean equals(Object obj) {
-    if (this.getClass() != obj.getClass()) return false; //no se si esta linea es necesaria
+    if (this.getClass() != obj.getClass()) return false;
     Paciente objPaciente = (Paciente) obj;
     return this.DNI.equals(objPaciente.DNI);
   }
@@ -116,7 +116,7 @@ public class Paciente implements Comparable<Paciente> {
   // Usad solo el DNI al calcular el hashCode
   @Override
   public int hashCode() {
-    return -1;
+    return this.DNI.hashCode();
   }
 
 }
