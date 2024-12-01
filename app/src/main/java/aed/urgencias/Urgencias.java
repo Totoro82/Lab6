@@ -15,24 +15,24 @@ public interface Urgencias {
   /**
    * Paciente entra en las urgencias. 
    * @returns el paciente nuevo
-   * @throws  la excepcion PacienteExisteException si
+//   * @throws  la excepcion PacienteExisteException si
    * ya hay una paciente con este DNI admitido, que no ha sido atendido, ni ha salido.
    */
    Paciente admitirPaciente(String DNI, int prioridad, int hora) throws PacienteExisteException; 
 
-  /** 
+  /**
    * Paciente sale de las urgencias. Borra el paciente de
    * las estructuras de datos de las urgencias.
    * @returns el paciente
-   * @throws la excepcion PacienteNoExisteException si
+//   * @throws la excepcion PacienteNoExisteException si
    * no hay una paciente con este DNI admitido.
    */
    Paciente salirPaciente(String DNI, int hora) throws PacienteNoExisteException;
 
   /**
-   * La prioridad del paciente cambia a nuevaPrioridad. 
+   * La prioridad del paciente cambia a nuevaPrioridad.
    * @returns el paciente
-   * @throws la excepcion PacienteNoExisteException si
+//   * @throws la excepcion PacienteNoExisteException si
    * no hay una paciente con este DNI admitido.
    */
    Paciente cambiarPrioridad(String DNI, int nuevaPrioridad, int hora) throws PacienteNoExisteException;
