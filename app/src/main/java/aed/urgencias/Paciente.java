@@ -2,6 +2,8 @@ package aed.urgencias;
 
 import es.upm.aedlib.Entry;
 
+import java.util.Comparator;
+
 /**
  * Un paciente.
  */
@@ -15,7 +17,7 @@ public class Paciente implements Comparable<Paciente> {
   private int tiempoAdmision;
   // Tiempo cuando entro en la prioridad
   private int tiempoAdmisionEnPrioridad;
-  private Entry<Integer, Paciente> enqueuedEntry;
+  private Entry<Paciente, Paciente> enqueuedEntry;
 
   /**
    * Constructor.
@@ -122,11 +124,11 @@ public class Paciente implements Comparable<Paciente> {
     return this.DNI.hashCode();
   }
 
-    public Entry<Integer, Paciente> getEnqueuedEntry() {
+  public Entry<Paciente, Paciente> getEnqueuedEntry() {
         return enqueuedEntry;
     }
 
-    public void setEnqueuedEntry(Entry<Integer, Paciente> enqueuedEntry) {
+    public void setEnqueuedEntry(Entry<Paciente, Paciente> enqueuedEntry) {
         this.enqueuedEntry = enqueuedEntry;
     }
 }

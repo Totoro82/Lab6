@@ -10,11 +10,12 @@ import es.upm.aedlib.priorityqueue.SortedListPriorityQueue;
 import es.upm.aedlib.tree.CompleteBinaryTree;
 
 import java.lang.reflect.Field;
+import java.util.Comparator;
 import java.util.Iterator;
 
 public class UrgenciasAED implements Urgencias {
 
-    PriorityQueue<Integer,Paciente> pacientesEsperando = new HeapPriorityQueue<>();
+    PriorityQueue<Paciente,Paciente> pacientesEsperando = new HeapPriorityQueue<>(Paciente::compareTo);
     Map<String, Paciente> pacientesPorDni = new HashTableMap<>();
     Integer tiempoDeEsperaAtendidos = 0;
     Integer numeroPacientesAtendidos = 0;
@@ -24,7 +25,7 @@ public class UrgenciasAED implements Urgencias {
         if (pacientesPorDni.containsKey(DNI)) throw new PacienteExisteException();
         else {
             Paciente nuevoPaciente = new Paciente(DNI,prioridad,hora, hora);
-            nuevoPaciente.setEnqueuedEntry(pacientesEsperando.enqueue(prioridad, nuevoPaciente));
+            nuevoPaciente.setEnqueuedEntry(pacientesEsperando.enqueue(nuevoPaciente, nuevoPaciente));
             pacientesPorDni.put(DNI, nuevoPaciente);
             return nuevoPaciente;
         }
@@ -44,36 +45,13 @@ public class UrgenciasAED implements Urgencias {
     public Paciente cambiarPrioridad(String DNI, int nuevaPrioridad, int hora) throws PacienteNoExisteException {
         if (!pacientesPorDni.containsKey(DNI)) throw new PacienteNoExisteException();
         Paciente paciente = pacientesPorDni.get(DNI);
-        if (nuevaPrioridad == paciente.getPrioridad()){
-            return paciente;
-        }
-        else {
-//            try {
-//                Class<?> clazz = pacientesEsperando.getClass();
-//                Field heapField = clazz.getDeclaredField("heap");
-//                heapField.setAccessible(true);
-//                CompleteBinaryTree<LocationAwareEntry<Integer, Paciente>> heap = (CompleteBinaryTree<LocationAwareEntry<Integer, Paciente>>) heapField.get(pacientesEsperando);
-//                System.out.println("Heap: " + heap);
-//                LocationAwareEntry<Integer, Paciente> entry = new LocationAwareEntryImpl<>(paciente.getPrioridad(), paciente);
-//                Position<LocationAwareEntry<Integer, Paciente>> pos = heap.add(entry);
-//            } catch (NoSuchFieldException | IllegalAccessException e) {
-//                e.printStackTrace();
-//            }
-
-
-//            this.setLocation(pos);
-//            this.upHeap(pos);
-//            return entry;
-
+        if (nuevaPrioridad != paciente.getPrioridad()){
             pacientesEsperando.remove(paciente.getEnqueuedEntry());
-//            pacientesPorDni.remove(DNI);
             paciente.setPrioridad(nuevaPrioridad);
             paciente.setTiempoAdmisionEnPrioridad(hora);
-//            pacientesPorDni.put(DNI, paciente);
-            paciente.setEnqueuedEntry(pacientesEsperando.enqueue(nuevaPrioridad,paciente));
-//            pacientesEsperando.replaceKey(pacientesEsperando.enqueue(primerPaciente.getKey(),primerPaciente.getValue()), nuevaPrioridad);
-            return paciente;
+            paciente.setEnqueuedEntry(pacientesEsperando.enqueue(paciente,paciente));
         }
+            return paciente;
     }
 
     @Override
@@ -90,7 +68,7 @@ public class UrgenciasAED implements Urgencias {
 
     @Override
     public void aumentaPrioridad(int maxTiempoEspera, int hora) {
-        for(Entry<Integer, Paciente> entry : pacientesEsperando) {
+        for(Entry<Paciente, Paciente> entry : pacientesEsperando) {
             Paciente paciente = entry.getValue();
             int tiempoDeEsperaDePaciente = hora - paciente.getTiempoAdmisionEnPrioridad();
 
@@ -98,8 +76,7 @@ public class UrgenciasAED implements Urgencias {
                 pacientesEsperando.remove(paciente.getEnqueuedEntry());
                 paciente.setPrioridad(paciente.getPrioridad() - 1);
                 paciente.setTiempoAdmisionEnPrioridad(hora);
-                paciente.setEnqueuedEntry(pacientesEsperando.enqueue(paciente.getPrioridad(),paciente));
-//                pacientesEsperando.replaceKey(pacientesEsperando.enqueue(primerPaciente.getKey(),primerPaciente.getValue()), paciente.getPrioridad() - 1);
+                paciente.setEnqueuedEntry(pacientesEsperando.enqueue(paciente,paciente));
             }
         }
     }
@@ -108,8 +85,9 @@ public class UrgenciasAED implements Urgencias {
     @Override
     public Iterable<Paciente> pacientesEsperando() {
         PositionList<Paciente> iterableRespuesta = new NodePositionList<>();
-        for(Entry<Integer, Paciente> entrada : pacientesEsperando) {
-            iterableRespuesta.addLast(entrada.getValue());
+        HeapPriorityQueue<Paciente, Paciente> copiaPacientesEsperando = new HeapPriorityQueue<>(Paciente::compareTo, this.pacientesEsperando);
+        while(!copiaPacientesEsperando.isEmpty()) {
+            iterableRespuesta.addLast(copiaPacientesEsperando.dequeue().getValue());
         }
         return iterableRespuesta;
     }
