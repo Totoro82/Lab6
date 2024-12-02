@@ -1,16 +1,12 @@
 package aed.urgencias;
 
 import es.upm.aedlib.Entry;
-import es.upm.aedlib.EntryImpl;
 import es.upm.aedlib.Pair;
 import es.upm.aedlib.map.*;
 import es.upm.aedlib.positionlist.NodePositionList;
 import es.upm.aedlib.positionlist.PositionList;
 import es.upm.aedlib.priorityqueue.HeapPriorityQueue;
 import es.upm.aedlib.priorityqueue.PriorityQueue;
-import es.upm.aedlib.priorityqueue.SortedListPriorityQueue;
-
-import java.util.Iterator;
 
 public class UrgenciasAED implements Urgencias {
 
@@ -34,11 +30,22 @@ public class UrgenciasAED implements Urgencias {
     public Paciente salirPaciente(String DNI, int hora) throws PacienteNoExisteException {
         if (!pacientesPorDni.containsKey(DNI)) throw new PacienteNoExisteException();
         else {
-            Entry<Integer, Paciente> primerPaciente = pacientesEsperando.first();
+            Paciente paciente = pacientesPorDni.remove(DNI);
+            PriorityQueue<Integer, Paciente> newPacientesEsperando = new HeapPriorityQueue<>();
+
+            while (!pacientesEsperando.isEmpty()) {
+                Entry<Integer, Paciente> entry = pacientesEsperando.dequeue();
+                if (!entry.getValue().equals(paciente)) {
+                    newPacientesEsperando.enqueue(entry.getKey(),entry.getValue());
+                }
+            }
+            pacientesEsperando = newPacientesEsperando;
+            return paciente;
+            /*Entry<Integer, Paciente> primerPaciente = pacientesEsperando.first();
             pacientesEsperando.remove(pacientesEsperando.first());
             Paciente paciente = pacientesPorDni.remove(DNI);
             pacientesEsperando.enqueue(primerPaciente.getKey(),primerPaciente.getValue());
-            return paciente;
+            return paciente;*/
         }
     }
 
@@ -46,17 +53,15 @@ public class UrgenciasAED implements Urgencias {
     public Paciente cambiarPrioridad(String DNI, int nuevaPrioridad, int hora) throws PacienteNoExisteException {
         if (!pacientesPorDni.containsKey(DNI)) throw new PacienteNoExisteException();
         Paciente paciente = pacientesPorDni.get(DNI);
-        if (nuevaPrioridad == paciente.getPrioridad()){
-            return paciente;
-        }
-        else {
+        if (nuevaPrioridad != paciente.getPrioridad()) {
             Entry<Integer, Paciente> primerPaciente = pacientesEsperando.first();
             pacientesEsperando.remove(pacientesEsperando.first());
             paciente.setPrioridad(nuevaPrioridad);
             paciente.setTiempoAdmisionEnPrioridad(hora);
-            pacientesEsperando.replaceKey(pacientesEsperando.enqueue(primerPaciente.getKey(),primerPaciente.getValue()), nuevaPrioridad);
-            return paciente;
+            pacientesEsperando.enqueue(primerPaciente.getKey(), primerPaciente.getValue());
+//            pacientesEsperando.replaceKey(pacientesEsperando.enqueue(primerPaciente.getKey(), primerPaciente.getValue()), nuevaPrioridad);
         }
+        return paciente;
     }
 
     @Override
