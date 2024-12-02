@@ -1,6 +1,8 @@
 package aed.urgencias;
 
-import javax.management.MBeanAttributeInfo;
+import es.upm.aedlib.Entry;
+
+import java.util.Comparator;
 
 /**
  * Un paciente.
@@ -9,12 +11,13 @@ public class Paciente implements Comparable<Paciente> {
 
   // DNI
   private String DNI;
-  // Prioridad 
+  // Prioridad
   private int prioridad;
   // Tiempo de admision en las urgencias
   private int tiempoAdmision;
-  // Tiempo cuando entro en la prioridad 
+  // Tiempo cuando entro en la prioridad
   private int tiempoAdmisionEnPrioridad;
+  private Entry<Paciente, Paciente> enqueuedEntry;
 
   /**
    * Constructor.
@@ -94,7 +97,7 @@ public class Paciente implements Comparable<Paciente> {
     if (this.prioridad < paciente.prioridad) {
       prioridad = -1;
     } else if (paciente.prioridad == this.prioridad) {
-      if (this.tiempoAdmisionEnPrioridad > paciente.tiempoAdmisionEnPrioridad) {
+      if (this.tiempoAdmisionEnPrioridad < paciente.tiempoAdmisionEnPrioridad) {
         prioridad = -1;
       } else if (paciente.tiempoAdmisionEnPrioridad == this.tiempoAdmisionEnPrioridad) {
         if (this.tiempoAdmision < paciente.tiempoAdmision) {
@@ -104,7 +107,7 @@ public class Paciente implements Comparable<Paciente> {
     }
     return prioridad;
   }
-  
+
   // Hay que definir equals
   // Usad solo el DNI al comparar pacientes
   @Override
@@ -121,4 +124,11 @@ public class Paciente implements Comparable<Paciente> {
     return this.DNI.hashCode();
   }
 
+  public Entry<Paciente, Paciente> getEnqueuedEntry() {
+        return enqueuedEntry;
+    }
+
+    public void setEnqueuedEntry(Entry<Paciente, Paciente> enqueuedEntry) {
+        this.enqueuedEntry = enqueuedEntry;
+    }
 }
